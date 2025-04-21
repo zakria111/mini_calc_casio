@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .calculator-container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .button-group-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button.clear {
+            background-color: #f44336;
+        }
+        button.clear:hover {
+            background-color: #d32f2f;
+        }
+        .result {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4CAF50;
+        }
+        .history {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .history h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .toggle-switch label {
+            margin-right: 10px;
+            margin-bottom: 0;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator-container">
+    <h1>Enhanced Calculator</h1>
+    
+    <div class="toggle-switch">
+        <label>Dark Mode</label>
+        <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+    
+    <div class="input-group">
+        <label for="display">Display</label>
+        <input type="text" id="display" readonly>
+    </div>
+    
+    <div class="button-group">
+        <button class="clear" onclick="clearAll()">AC</button>
+        <button class="clear" onclick="backspace()">⌫</button>
+        <button onclick="appendToDisplay('(')">(</button>
+        <button onclick="appendToDisplay(')')">)</button>
+        
+        <button onclick="appendToDisplay('7')">7</button>
+        <button onclick="appendToDisplay('8')">8</button>
+        <button onclick="appendToDisplay('9')">9</button>
+        <button onclick="appendToDisplay('/')">/</button>
+        
+        <button onclick="appendToDisplay('4')">4</button>
+        <button onclick="appendToDisplay('5')">5</button>
+        <button onclick="appendToDisplay('6')">6</button>
+        <button onclick="appendToDisplay('*')">×</button>
+        
+        <button onclick="appendToDisplay('1')">1</button>
+        <button onclick="appendToDisplay('2')">2</button>
+        <button onclick="appendToDisplay('3')">3</button>
+        <button onclick="appendToDisplay('-')">-</button>
+        
+        <button onclick="appendToDisplay('0')">0</button>
+        <button onclick="appendToDisplay('.')">.</button>
+        <button onclick="calculateResult()">=</button>
+        <button onclick="appendToDisplay('+')">+</button>
+    </div>
+    
+    <div class="result">
+        <h3>Result: <span id="result">0</span></h3>
+    </div>
+    
+    <div class="history">
+        <h3>Calculation History</h3>
+        <div id="history-list"></div>
+    </div>
+</div>
+
+<script>
+    // Variables
+    let darkMode = false;
+    
+    // DOM Elements
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const display = document.getElementById('display');
+    const result = document.getElementById('result');
+    const historyList = document.getElementById('history-list');
+    
+    // Initialize display
+    display.value = '';
+    
+    // Calculator functions
+    function appendToDisplay(value) {
+        display.value += value;
+    }
+    
+    function clearAll() {
+        display.value = '';
+        result.textContent = '0';
+    }
+    
+    function backspace() {
+        display.value = display.value.slice(0, -1);
+    }
+    
+    function calculateResult() {
+        try {
+            const expression = display.value;
+            const calculationResult = eval(expression);
+            result.textContent = calculationResult;
+            
+            // Add to history
+            addToHistory(`${expression} = ${calculationResult}`);
+            
+            return calculationResult;
+        } catch (error) {
+            result.textContent = 'Error';
+            return 'Error';
+        }
+    }
+    
+    // History functions
+    function addToHistory(text) {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.textContent = text;
+        historyList.prepend(historyItem);
+        
+        // Limit history items
+        if (historyList.children.length > 10) {
+            historyList.removeChild(historyList.lastChild);
+        }
+    }
+    
+    // Dark mode toggle
+    darkModeToggle.addEventListener('change', function() {
+        darkMode = this.checked;
+        applyDarkMode();
+    });
+    
+    function applyDarkMode() {
+        const body = document.body;
+        const calculatorContainer = document.querySelector('.calculator-container');
+        
+        if (darkMode) {
+            body.style.backgroundColor = '#222';
+            calculatorContainer.style.backgroundColor = '#333';
+            calculatorContainer.style.color = '#fff';
+            document.querySelectorAll('h1, h3, label').forEach(el => {
+                el.style.color = '#fff';
+            });
+            document.querySelectorAll('input[type="text"]').forEach(el => {
+                el.style.backgroundColor = '#444';
+                el.style.color = '#fff';
+                el.style.borderColor = '#555';
+            });
+            document.querySelector('.result').style.backgroundColor = '#444';
+            document.querySelector('.history').style.backgroundColor = '#444';
+            document.querySelector('.history').style.borderColor = '#555';
+        } else {
+            body.style.backgroundColor = '#f5f5f5';
+            calculatorContainer.style.backgroundColor = '#fff';
+            calculatorContainer.style.color = '#333';
+            document.querySelectorAll('h1, h3, label').forEach(el => {
+                el.style.color = '';
+            });
+            document.querySelectorAll('input[type="text"]').forEach(el => {
+                el.style.backgroundColor = '';
+                el.style.color = '';
+                el.style.borderColor = '';
+            });
+            document.querySelector('.result').style.backgroundColor = '#f9f9f9';
+            document.querySelector('.history').style.backgroundColor = '';
+            document.querySelector('.history').style.borderColor = '#ddd';
+        }
+    }
+</script>
+
+</body>
+</html>
